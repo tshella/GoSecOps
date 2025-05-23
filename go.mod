@@ -9,7 +9,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.29.14
 	github.com/aws/aws-sdk-go-v2/service/iam v1.42.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.4
-	github.com/aws/aws-sdk-go-v2/service/s3control v1.58.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/spf13/cobra v1.7.0
 	github.com/swaggo/files v1.0.1
