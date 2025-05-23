@@ -11,6 +11,17 @@ type IAMRequest struct {
 	Profile string `json:"profile"`
 }
 
+// HandleIAMCheck godoc
+// @Summary Audit AWS IAM users and attached policies
+// @Description Detects overly permissive IAM policies
+// @Tags Cloud
+// @Accept json
+// @Produce json
+// @Param input body IAMRequest true "IAM Profile Input"
+// @Success 200 {array} cloud.IAMFinding
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /cloud/iam [post]
 func HandleIAMCheck(c *gin.Context) {
 	var req IAMRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

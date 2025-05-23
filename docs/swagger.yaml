@@ -1,0 +1,287 @@
+basePath: /api
+definitions:
+  cloud.DNSCheckResult:
+    properties:
+      cname:
+        type: string
+      dangling:
+        type: boolean
+      error:
+        type: string
+      ip:
+        type: string
+      subdomain:
+        type: string
+    type: object
+  cloud.IAMFinding:
+    properties:
+      issues:
+        items:
+          type: string
+        type: array
+      policy_name:
+        type: string
+      user:
+        type: string
+    type: object
+  cloud.S3AuditResult:
+    properties:
+      acl_grants_exist:
+        type: boolean
+      bucket:
+        type: string
+      error:
+        type: string
+      public_access:
+        type: boolean
+    type: object
+  email.EmailAnalysis:
+    properties:
+      dkim:
+        type: string
+      dmarc:
+        type: string
+      domain:
+        type: string
+      spf:
+        type: string
+    type: object
+  handlers.DNSCloudRequest:
+    properties:
+      domain:
+        type: string
+      subdomains:
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.EmailAnalyzeInput:
+    properties:
+      domain:
+        type: string
+    type: object
+  handlers.EmailAttackInput:
+    properties:
+      body:
+        type: string
+      from:
+        type: string
+      subject:
+        type: string
+      to:
+        type: string
+    type: object
+  handlers.IAMRequest:
+    properties:
+      profile:
+        type: string
+    type: object
+  handlers.S3AuditRequest:
+    properties:
+      bucket:
+        type: string
+      profile:
+        type: string
+    type: object
+  handlers.ScanRequest:
+    properties:
+      target:
+        type: string
+    type: object
+host: localhost:8181
+info:
+  contact:
+    email: manaka@example.com
+    name: Manaka Anthony Raphasha
+  description: REST API for Penetration Testing & Cloud Security Tools
+  title: GoSecOps API
+  version: "1.0"
+paths:
+  /cloud/dns:
+    post:
+      consumes:
+      - application/json
+      description: Detects dangling CNAMEs or unresolvable subdomains
+      parameters:
+      - description: DNS Scan Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.DNSCloudRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/cloud.DNSCheckResult'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Scan cloud subdomains for misconfigurations
+      tags:
+      - Cloud
+  /cloud/iam:
+    post:
+      consumes:
+      - application/json
+      description: Detects overly permissive IAM policies
+      parameters:
+      - description: IAM Profile Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.IAMRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/cloud.IAMFinding'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Audit AWS IAM users and attached policies
+      tags:
+      - Cloud
+  /cloud/s3:
+    post:
+      consumes:
+      - application/json
+      description: Checks ACLs and Public Access Block on given bucket
+      parameters:
+      - description: S3 Audit Request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.S3AuditRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cloud.S3AuditResult'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Audit S3 bucket for public exposure
+      tags:
+      - Cloud
+  /email/analyze:
+    post:
+      consumes:
+      - application/json
+      description: Checks email security configs for a domain
+      parameters:
+      - description: Domain to analyze
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EmailAnalyzeInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/email.EmailAnalysis'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Analyze SPF/DKIM/DMARC records
+      tags:
+      - Email
+  /email/attack:
+    post:
+      consumes:
+      - application/json
+      description: Sends an email using fake "From" field (Maildev/Mailhog only)
+      parameters:
+      - description: Spoofed Email Data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EmailAttackInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Send spoofed test email
+      tags:
+      - Email
+  /scan/port:
+    post:
+      consumes:
+      - application/json
+      description: Performs a basic port scan (1-1024)
+      parameters:
+      - description: Target Host Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ScanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Scan open TCP ports on a host
+      tags:
+      - Scanner
+swagger: "2.0"

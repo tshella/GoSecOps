@@ -12,6 +12,16 @@ type DNSCloudRequest struct {
 	Subdomains []string `json:"subdomains"`
 }
 
+// HandleDNSCloudScan godoc
+// @Summary Scan cloud subdomains for misconfigurations
+// @Description Detects dangling CNAMEs or unresolvable subdomains
+// @Tags Cloud
+// @Accept json
+// @Produce json
+// @Param input body DNSCloudRequest true "DNS Scan Input"
+// @Success 200 {array} cloud.DNSCheckResult
+// @Failure 400 {object} map[string]string
+// @Router /cloud/dns [post]
 func HandleDNSCloudScan(c *gin.Context) {
 	var req DNSCloudRequest
 	if err := c.ShouldBindJSON(&req); err != nil || req.Domain == "" {

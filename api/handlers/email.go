@@ -18,7 +18,17 @@ type EmailAnalyzeInput struct {
 	Domain string `json:"domain"`
 }
 
-// POST /api/email/attack
+// HandleEmailAttack godoc
+// @Summary Send spoofed test email
+// @Description Sends an email using fake "From" field (Maildev/Mailhog only)
+// @Tags Email
+// @Accept json
+// @Produce json
+// @Param input body EmailAttackInput true "Spoofed Email Data"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /email/attack [post]
 func HandleEmailAttack(c *gin.Context) {
 	var req EmailAttackInput
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -40,7 +50,16 @@ func HandleEmailAttack(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "Spoofed email sent", "to": req.To})
 }
 
-// POST /api/email/analyze
+// HandleEmailAnalyze godoc
+// @Summary Analyze SPF/DKIM/DMARC records
+// @Description Checks email security configs for a domain
+// @Tags Email
+// @Accept json
+// @Produce json
+// @Param input body EmailAnalyzeInput true "Domain to analyze"
+// @Success 200 {object} email.EmailAnalysis
+// @Failure 400 {object} map[string]string
+// @Router /email/analyze [post]
 func HandleEmailAnalyze(c *gin.Context) {
 	var req EmailAnalyzeInput
 	if err := c.ShouldBindJSON(&req); err != nil || req.Domain == "" {
