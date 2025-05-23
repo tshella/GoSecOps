@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
-	"gosecops/internal/scanner"
+	"github.com/tshella/gosecops/internal/scanner"
 )
 
 var target string

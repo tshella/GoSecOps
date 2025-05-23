@@ -1,6 +1,6 @@
 # 🛡️ GoSecOps – Penetration Testing & Cloud Security Toolkit
 
-**GoSecOps** is a modular, containerized security tool built in **GoLang**. It offers both **CLI** and **REST API** interfaces for red-team attack simulations (e.g., port scanning, spoofed emails) and blue-team validation (e.g., SPF/DKIM/DMARC checks, IAM audits, DNS misconfigs, S3 exposure).
+**GoSecOps** is a modular, containerized security toolkit built with **GoLang**. It supports both **CLI** and **REST API** interfaces for red-team attack simulation (e.g., port scanning, spoofed emails) and blue-team validation (e.g., SPF/DKIM/DMARC analysis, IAM audits, DNS misconfigs, and S3 exposure).
 
 > **Cloud Security Architect:** Manaka Anthony Raphasha
 
@@ -25,122 +25,128 @@
 ## 🧱 Project Structure
 
 gosecops/
-├── api/
-│ ├── handlers/ # REST handlers
-│ └── routes.go # API endpoint mapping
-├── cmd/ # CLI commands
+├── api/ # REST API layer
+│ ├── handlers/ # Endpoint logic
+│ └── routes.go # API route definitions
+├── cmd/ # CLI command handlers
 │ ├── root.go
 │ ├── scan.go
 │ ├── email.go
 │ ├── iam.go
 │ ├── s3.go
 │ └── dns.go
-├── internal/ # Core modules
-│ ├── scanner/ # Port scanner logic
-│ ├── email/ # Email spoof + analysis
-│ ├── cloud/ # IAM, S3, DNS misconfig tools
-│ ├── utils/ # Common helpers
-│ └── validator/ # (Planned) header checks
+├── internal/ # Core security logic
+│ ├── scanner/ # Port scanning logic
+│ ├── email/ # Spoof + SPF/DKIM/DMARC logic
+│ ├── cloud/ # IAM, S3, DNS audits
+│ ├── utils/ # Shared utilities
+│ └── validator/ # (Planned) security header analyzer
 ├── web/ # Optional SvelteKit frontend
-├── Dockerfile
-├── docker-compose.yml
-├── main.go
-├── go.mod
-└── README.md
+├── Dockerfile # Multi-stage backend build
+├── docker-compose.yml # For API + mail testing
+├── main.go # Entry point
+├── go.mod # Go module metadata
+└── README.md # Project documentation
 
 
 ---
 
 ## 💻 Getting Started
 
-### Prerequisites
+### ✅ Prerequisites
 
 - Go 1.20+
-- Docker + Docker Compose (optional but recommended)
-- Node.js (for optional web frontend)
+- Docker + Docker Compose (recommended)
+- Node.js (for optional frontend)
 
 ---
 
-## 🔧 Build and Run
+## 🔧 Build & Run
 
-### 🧪 CLI Mode
+### 🧪 CLI Usage
 
 ```bash
-# Port scan
+# Port Scan
 go run main.go scan --target 192.168.0.1
 
-# Spoofed email
+# Send spoofed email
 go run main.go email attack --from spoof@microsoft.com --to victim@yourdomain.test
 
-# SPF/DKIM/DMARC analysis
+# Analyze SPF/DKIM/DMARC
 go run main.go email analyze --domain yourdomain.test
 
-# IAM audit
+# IAM Policy Audit
 go run main.go iam check --profile default
 
-# S3 bucket audit
+# S3 Bucket Audit
 go run main.go s3 audit --bucket my-bucket --profile default
 
-# DNS misconfiguration check
+# DNS CNAME Misconfiguration Scan
 go run main.go dns cloud --domain example.com --subdomains www,api,staging
 
-🌐 API Mode
+🌐 API Server
 
-# Start API server on port 8181
+# Start API server on http://localhost:8181
 go run main.go
 
-Then access endpoints at: http://localhost:8181/api
-🐳 Docker
+🐳 Docker Mode
 
 docker compose up --build
+
+Then access the API at:
+
+http://localhost:8181/api
+http://localhost:8181/swagger/index.html
 
 📬 API Endpoints
 Method	Endpoint	Description
 POST	/api/scan/port	Run a TCP port scan
-POST	/api/email/attack	Send spoofed test email
-POST	/api/email/analyze	Analyze SPF/DKIM/DMARC config
-POST	/api/cloud/iam	Analyze AWS IAM policies
-POST	/api/cloud/s3	Audit S3 bucket for exposure
-POST	/api/cloud/dns	Scan for DNS CNAME misconfigs
+POST	/api/email/attack	Send a spoofed test email
+POST	/api/email/analyze	Analyze SPF/DKIM/DMARC
+POST	/api/cloud/iam	Audit AWS IAM policies
+POST	/api/cloud/s3	Detect public exposure of S3 buckets
+POST	/api/cloud/dns	Scan for DNS CNAME misconfigurations
 🔐 Security & Ethics Notice
 
 ⚠️ GoSecOps is for educational and authorized testing only.
-Never scan or spoof domains you do not own or have written permission to test.
 
-    Spoofed emails are sandboxed via Mailhog/Maildev
+    Never scan or spoof any system or domain you do not own or have explicit permission to test.
 
-    Designed for red/blue team simulations in test environments
+    Spoofed emails are routed to Mailhog/Maildev in isolated testing environments.
 
-    Logs and future features will include audit trails
+    Logs and audit trails are in planning to ensure safe usage and traceability.
 
-🧪 Testing Environment
+🧪 Testing Environment (Email Spoofing)
 
-Use this in docker-compose.yml to test spoofed email output:
+Include this in your docker-compose.yml:
 
 mailtest:
   image: maildev/maildev
   ports:
-    - "1080:1080" # Mail Web UI
-    - "1025:1025" # SMTP test port
+    - "1080:1080"  # Mail Web UI
+    - "1025:1025"  # SMTP test port
 
-📬 View captured emails at: http://localhost:1080
+📬 Access captured emails at: http://localhost:1080
 🛠️ Libraries Used
 Purpose	Library
 CLI Framework	github.com/spf13/cobra
 HTTP API Server	github.com/gin-gonic/gin
 Email Spoofing	net/smtp
-AWS Cloud SDK	github.com/aws/aws-sdk-go-v2
-DNS Lookups	net.LookupTXT / net.LookupIP
+AWS SDK	github.com/aws/aws-sdk-go-v2
+Swagger UI	github.com/swaggo/gin-swagger
+DNS Lookups	net.LookupTXT, net.LookupIP
 Port Scanning	net.DialTimeout
 📦 Roadmap
 
     ✅ Cloud IAM, S3, DNS misconfig modules
 
-    ✅ SvelteKit frontend dashboard
+    ✅ Swagger API documentation
+
+    ✅ SvelteKit frontend (in progress)
 
     ⏳ Security header analyzer
 
-    ⏳ CSV/JSON report exports
+    ⏳ JSON/CSV report export
 
     ⏳ WebSocket log streams
 
@@ -148,19 +154,20 @@ Port Scanning	net.DialTimeout
 
 👨‍💻 Dev Commands
 
-# Run a CLI audit
+# Run a scan
 go run main.go s3 audit --bucket my-bucket --profile default
 
-# Start API
+# Start the API server
 go run main.go
 
-# Docker dev environment
+# Docker development environment
 docker compose up --build
 
 🤝 Contributing
 
-Pull requests, feedback, and security reviews are welcome.
-Please include test coverage for new modules/features.
+Contributions are welcome!
+Please include unit tests for any new modules or features.
+We appreciate pull requests, feedback, and security reviews.
 📜 License
 
-MIT License – see LICENSE file.
+MIT License – see LICENSE

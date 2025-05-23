@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"gosecops/internal/email"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tshella/gosecops/internal/email"
 )
 
 type EmailAttackInput struct {

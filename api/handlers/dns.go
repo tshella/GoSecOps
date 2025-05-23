@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"gosecops/internal/cloud"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tshella/gosecops/internal/cloud"
 )
 
 type DNSCloudRequest struct {

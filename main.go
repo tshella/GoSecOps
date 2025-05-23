@@ -1,10 +1,9 @@
 package main
 
 import (
-	"gosecops/api"
-	_ "gosecops/docs"
+	"github.com/tshella/gosecops/api"
+	_ "github.com/tshella/gosecops/docs" // Needed for swag to include generated docs
 
-	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -13,16 +12,17 @@ import (
 // @version 1.0
 // @description REST API for Penetration Testing & Cloud Security Tools
 // @contact.name Manaka Anthony Raphasha
-// @contact.email manaka@example.com
+// @contact.email anthonyraphasha@gmail.com
 // @host localhost:8181
 // @BasePath /api
-
 func main() {
 	r := api.SetupRouter()
 
-	// Add Swagger route
+	// Serve Swagger UI at /swagger/
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Start server
-	r.Run(":8181")
+	// Start the server on port 8181
+	if err := r.Run(":8181"); err != nil {
+		panic("Failed to start server: " + err.Error())
+	}
 }

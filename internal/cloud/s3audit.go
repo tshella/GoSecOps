@@ -10,53 +10,58 @@ import (
 
 type S3AuditResult struct {
 	Bucket         string `json:"bucket"`
-	PublicAccess   bool   `json:"public_access"`
-	ACLGrantsExist bool   `json:"acl_grants_exist"`
+	PublicAccess   bool   `json:"public_access"`    // true = publicly accessible
+	ACLGrantsExist bool   `json:"acl_grants_exist"` // true = public ACL found
 	Error          string `json:"error,omitempty"`
 }
 
 func AuditS3Bucket(profile, bucket string) S3AuditResult {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile(profile))
+	ctx := context.TODO()
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithSharedConfigProfile(profile))
 	if err != nil {
 		return S3AuditResult{Bucket: bucket, Error: "Failed to load AWS config: " + err.Error()}
 	}
 
 	client := s3.NewFromConfig(cfg)
 
-	// 1. Check ACL
-	aclResp, err := client.GetBucketAcl(context.TODO(), &s3.GetBucketAclInput{
+	// 1. Check ACLs
+	aclResp, err := client.GetBucketAcl(ctx, &s3.GetBucketAclInput{
 		Bucket: aws.String(bucket),
 	})
 	if err != nil {
 		return S3AuditResult{Bucket: bucket, Error: "Unable to get ACL: " + err.Error()}
 	}
 
-	public := false
+	publicACL := false
 	for _, grant := range aclResp.Grants {
 		if grant.Grantee != nil && grant.Grantee.URI != nil {
 			if *grant.Grantee.URI == "http://acs.amazonaws.com/groups/global/AllUsers" {
-				public = true
+				publicACL = true
+				break
 			}
 		}
 	}
 
 	// 2. Check Public Access Block config
-	blockResp, err := client.GetBucketPublicAccessBlock(context.TODO(), &s3.GetBucketPublicAccessBlockInput{
+	publicAccess := true // assume public unless proven otherwise
+	blockResp, err := client.GetPublicAccessBlock(ctx, &s3.GetPublicAccessBlockInput{
 		Bucket: aws.String(bucket),
 	})
-	if err != nil {
-		// Not having a public access block doesn't necessarily mean it's public
-	}
+	if err == nil && blockResp.PublicAccessBlockConfiguration != nil {
+		block := blockResp.PublicAccessBlockConfiguration
 
-	publicAccess := true
-	if blockResp.PublicAccessBlockConfiguration != nil {
-		cfg := blockResp.PublicAccessBlockConfiguration
-		publicAccess = !(cfg.BlockPublicAcls && cfg.BlockPublicPolicy && cfg.IgnorePublicAcls && cfg.RestrictPublicBuckets)
+		// Dereference *bools safely
+		allBlocked := aws.ToBool(block.BlockPublicAcls) &&
+			aws.ToBool(block.BlockPublicPolicy) &&
+			aws.ToBool(block.IgnorePublicAcls) &&
+			aws.ToBool(block.RestrictPublicBuckets)
+
+		publicAccess = !allBlocked // true means public
 	}
 
 	return S3AuditResult{
 		Bucket:         bucket,
 		PublicAccess:   publicAccess,
-		ACLGrantsExist: public,
+		ACLGrantsExist: publicACL,
 	}
 }

@@ -91,7 +91,7 @@ definitions:
 host: localhost:8181
 info:
   contact:
-    email: manaka@example.com
+    email: anthonyraphasha@gmail.com
     name: Manaka Anthony Raphasha
   description: REST API for Penetration Testing & Cloud Security Tools
   title: GoSecOps API

@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"gosecops/internal/cloud"
+
+	"github.com/tshella/gosecops/internal/cloud"
 
 	"github.com/spf13/cobra"
 )

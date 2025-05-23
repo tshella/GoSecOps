@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"gosecops/internal/email"
+
+	"github.com/tshella/gosecops/internal/email"
 
 	"github.com/spf13/cobra"
 )
