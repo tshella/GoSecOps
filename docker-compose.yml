@@ -7,5 +7,6 @@ services:
       - "8181:8181"
     volumes:
       - .:/app
+      - ~/.aws:/root/.aws:ro
     environment:
       - GO_ENV=dev

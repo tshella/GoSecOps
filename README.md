@@ -1,20 +1,24 @@
-# 🛡️ GoSecOps – Penetration Testing & Email Security Toolkit
+# 🛡️ GoSecOps – Penetration Testing & Cloud Security Toolkit
 
-GoSecOps is a modular, containerized security tool built with **GoLang**. It offers both **CLI** and **REST API** interfaces for red-team attack simulations (port scanning, spoofed emails) and blue-team validation (SPF/DKIM/DMARC checks, DNS recon, etc.).
+**GoSecOps** is a modular, containerized security tool built in **GoLang**. It offers both **CLI** and **REST API** interfaces for red-team attack simulations (e.g., port scanning, spoofed emails) and blue-team validation (e.g., SPF/DKIM/DMARC checks, IAM audits, DNS misconfigs, S3 exposure).
 
-Cloud Security Architect: Manaka Anthony Raphasha
+> **Cloud Security Architect:** Manaka Anthony Raphasha
+
 ---
 
 ## 🚀 Features
 
-| Feature         | CLI             | API            | Status  |
-|----------------|------------------|----------------|---------|
-| Port Scanner    | ✅ `scan ports`  | ✅ `/scan/port` | ✅ Done |
-| Email Spoofing  | ✅ `email attack`| ✅ `/email/attack` | ✅ Done |
-| Email Analysis  | ✅ `email analyze` | ✅ `/email/analyze` | ✅ Done |
-| Web UI (Svelte) | ❌ In progress   | ✅ Ready to connect | 🔧 |
-| DNS Recon       | Coming soon     | Coming soon    | ⏳     |
-| Logging         | JSON + stdout (planned) | | 🔧     |
+| Feature              | CLI Command             | REST API Endpoint         | Status   |
+|----------------------|-------------------------|----------------------------|----------|
+| Port Scanning        | `scan`                  | `/api/scan/port`           | ✅ Done  |
+| Email Spoofing       | `email attack`          | `/api/email/attack`        | ✅ Done  |
+| Email Analysis       | `email analyze`         | `/api/email/analyze`       | ✅ Done  |
+| IAM Policy Audit     | `iam check`             | `/api/cloud/iam`           | ✅ Done  |
+| S3 Bucket Audit      | `s3 audit`              | `/api/cloud/s3`            | ✅ Done  |
+| DNS Cloud Scanner    | `dns cloud`             | `/api/cloud/dns`           | ✅ Done  |
+| Web UI (SvelteKit)   | ❌ In progress           | ✅ Backend Ready            | 🧪 Alpha |
+| Logging              | JSON/stdout (planned)   | —                          | 🟡 Soon  |
+| Report Export (JSON) | —                       | —                          | 🟡 Soon  |
 
 ---
 
@@ -22,19 +26,22 @@ Cloud Security Architect: Manaka Anthony Raphasha
 
 gosecops/
 ├── api/
-│ ├── handlers/ # REST handlers (port scan, email, etc.)
-│ └── routes.go # API route mappings
-├── cmd/ # CLI commands using Cobra
+│ ├── handlers/ # REST handlers
+│ └── routes.go # API endpoint mapping
+├── cmd/ # CLI commands
 │ ├── root.go
 │ ├── scan.go
-│ └── email.go
+│ ├── email.go
+│ ├── iam.go
+│ ├── s3.go
+│ └── dns.go
 ├── internal/ # Core modules
-│ ├── scanner/ # TCP port scanning
-│ ├── email/ # Email attack & SPF/DKIM analysis
-│ ├── dns/ # Subdomain brute force (soon)
-│ ├── utils/ # Shared helpers
-│ └── validator/ # Header analysis (planned)
-├── web/ # Optional SvelteKit UI
+│ ├── scanner/ # Port scanner logic
+│ ├── email/ # Email spoof + analysis
+│ ├── cloud/ # IAM, S3, DNS misconfig tools
+│ ├── utils/ # Common helpers
+│ └── validator/ # (Planned) header checks
+├── web/ # Optional SvelteKit frontend
 ├── Dockerfile
 ├── docker-compose.yml
 ├── main.go
@@ -47,92 +54,113 @@ gosecops/
 ## 💻 Getting Started
 
 ### Prerequisites
+
 - Go 1.20+
 - Docker + Docker Compose (optional but recommended)
-- Node.js (if using the web frontend)
+- Node.js (for optional web frontend)
 
 ---
 
 ## 🔧 Build and Run
 
-### CLI Mode
+### 🧪 CLI Mode
+
 ```bash
-# Port scan CLI
+# Port scan
 go run main.go scan --target 192.168.0.1
 
-# Send spoofed email
+# Spoofed email
 go run main.go email attack --from spoof@microsoft.com --to victim@yourdomain.test
 
-# Analyze SPF/DKIM/DMARC
+# SPF/DKIM/DMARC analysis
 go run main.go email analyze --domain yourdomain.test
 
-API Mode
+# IAM audit
+go run main.go iam check --profile default
 
-# Start the API server on port 8181
+# S3 bucket audit
+go run main.go s3 audit --bucket my-bucket --profile default
+
+# DNS misconfiguration check
+go run main.go dns cloud --domain example.com --subdomains www,api,staging
+
+🌐 API Mode
+
+# Start API server on port 8181
 go run main.go
 
-Docker
+Then access endpoints at: http://localhost:8181/api
+🐳 Docker
 
 docker compose up --build
 
-Access API via http://localhost:8181/api.
 📬 API Endpoints
 Method	Endpoint	Description
 POST	/api/scan/port	Run a TCP port scan
-POST	/api/email/attack	Send spoofed email (test only)
-POST	/api/email/analyze	Analyze SPF/DKIM/DMARC
+POST	/api/email/attack	Send spoofed test email
+POST	/api/email/analyze	Analyze SPF/DKIM/DMARC config
+POST	/api/cloud/iam	Analyze AWS IAM policies
+POST	/api/cloud/s3	Audit S3 bucket for exposure
+POST	/api/cloud/dns	Scan for DNS CNAME misconfigs
 🔐 Security & Ethics Notice
 
-    ⚠️ GoSecOps is for educational and authorized testing only. Never run this toolkit against production systems or networks you do not own or have explicit permission to test.
+⚠️ GoSecOps is for educational and authorized testing only.
+Never scan or spoof domains you do not own or have written permission to test.
 
-    Spoofed emails are routed to Mailhog/Maildev in Docker.
+    Spoofed emails are sandboxed via Mailhog/Maildev
 
-    All modules are sandboxed to avoid unsafe behavior.
+    Designed for red/blue team simulations in test environments
+
+    Logs and future features will include audit trails
 
 🧪 Testing Environment
 
-Use the following docker-compose.yml service to test emails:
+Use this in docker-compose.yml to test spoofed email output:
 
 mailtest:
   image: maildev/maildev
   ports:
-    - "1080:1080" # Web UI
-    - "1025:1025" # SMTP
+    - "1080:1080" # Mail Web UI
+    - "1025:1025" # SMTP test port
 
-Access test emails at: http://localhost:1080
+📬 View captured emails at: http://localhost:1080
 🛠️ Libraries Used
 Purpose	Library
-CLI	github.com/spf13/cobra
-API Server	github.com/gin-gonic/gin
-Email	net/smtp
-DNS Lookups	net.LookupTXT
+CLI Framework	github.com/spf13/cobra
+HTTP API Server	github.com/gin-gonic/gin
+Email Spoofing	net/smtp
+AWS Cloud SDK	github.com/aws/aws-sdk-go-v2
+DNS Lookups	net.LookupTXT / net.LookupIP
 Port Scanning	net.DialTimeout
-📦 Coming Soon
+📦 Roadmap
 
-    ✅ DNS Recon (dnsrecon)
+    ✅ Cloud IAM, S3, DNS misconfig modules
 
-    ✅ WebSocket logs
+    ✅ SvelteKit frontend dashboard
 
-    ✅ Auth-protected Web UI (SvelteKit)
+    ⏳ Security header analyzer
 
-    ✅ Report export (JSON/CSV)
+    ⏳ CSV/JSON report exports
 
-    ✅ Logger module
+    ⏳ WebSocket log streams
 
-👨‍💻 Development Commands
+    ⏳ Role-based API auth (JWT/OAuth)
 
-# Run CLI with arguments
-go run main.go email analyze --domain example.com
+👨‍💻 Dev Commands
+
+# Run a CLI audit
+go run main.go s3 audit --bucket my-bucket --profile default
 
 # Start API
 go run main.go
 
-# Docker up
+# Docker dev environment
 docker compose up --build
 
 🤝 Contributing
 
-Pull requests, feedback, and security reviews are welcome. Please ensure tests are added for any new features.
+Pull requests, feedback, and security reviews are welcome.
+Please include test coverage for new modules/features.
 📜 License
 
-MIT License – see LICENSE
+MIT License – see LICENSE file.
