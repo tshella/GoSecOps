@@ -139,12 +139,6 @@ So now the sequence in your README would be:
 
 ---
 
-## 📚 Swagger UI (Interactive API Docs)
-
-Once the API server is running, access the Swagger UI at:
-
-➡️ [http://localhost:8181/swagger/index.html](http://localhost:8181/swagger/index.html)
-
 This provides:
 
 - 📖 **Full documentation** of each API route
