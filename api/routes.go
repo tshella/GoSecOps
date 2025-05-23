@@ -11,7 +11,9 @@ func SetupRouter() *gin.Engine {
 	api := r.Group("/api")
 	{
 		api.POST("/scan/port", handlers.HandlePortScan)
-		// More routes will go here
+
+		api.POST("/email/attack", handlers.HandleEmailAttack)
+		api.POST("/email/analyze", handlers.HandleEmailAnalyze)
 	}
 	return r
 }
