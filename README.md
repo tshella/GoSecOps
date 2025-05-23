@@ -98,15 +98,61 @@ Then access the API at:
 http://localhost:8181/api
 http://localhost:8181/swagger/index.html
 
+✅ Swagger UI Access (📚 API Documentation)
+
+## 📚 Swagger UI (Interactive API Docs)
+
+Once the API server is running, access the Swagger UI at:
+
+➡️ [http://localhost:8181/swagger/index.html](http://localhost:8181/swagger/index.html)
+
+This provides:
+
+- 📖 **Full documentation** of each API route
+- 🧪 **Built-in testing interface** (send requests directly from the browser)
+- 📂 **Schema definitions** for request and response bodies
+
+> You can also export your API definition as OpenAPI JSON/YAML from the UI
+
+✅ Where to Insert It
+
+This section should come right after 📬 API Endpoints and before 🔐 Security & Ethics Notice.
+
+So now the sequence in your README would be:
+
 📬 API Endpoints
-Method	Endpoint	Description
-POST	/api/scan/port	Run a TCP port scan
-POST	/api/email/attack	Send a spoofed test email
-POST	/api/email/analyze	Analyze SPF/DKIM/DMARC
-POST	/api/cloud/iam	Audit AWS IAM policies
-POST	/api/cloud/s3	Detect public exposure of S3 buckets
-POST	/api/cloud/dns	Scan for DNS CNAME misconfigurations
+📚 Swagger UI (Interactive API Docs)
 🔐 Security & Ethics Notice
+
+✅ Resulting Snippet Example
+
+## 📬 API Endpoints
+
+| Method | Endpoint             | Description                             |
+|--------|----------------------|-----------------------------------------|
+| POST   | `/api/scan/port`     | Run a TCP port scan                     |
+| POST   | `/api/email/attack`  | Send a spoofed test email               |
+| POST   | `/api/email/analyze` | Analyze SPF/DKIM/DMARC                  |
+| POST   | `/api/cloud/iam`     | Audit AWS IAM policies                  |
+| POST   | `/api/cloud/s3`      | Detect public exposure of S3 buckets    |
+| POST   | `/api/cloud/dns`     | Scan for DNS CNAME misconfigurations    |
+
+---
+
+## 📚 Swagger UI (Interactive API Docs)
+
+Once the API server is running, access the Swagger UI at:
+
+➡️ [http://localhost:8181/swagger/index.html](http://localhost:8181/swagger/index.html)
+
+This provides:
+
+- 📖 **Full documentation** of each API route
+- 🧪 **Built-in testing interface** (send requests directly from the browser)
+- 📂 **Schema definitions** for request and response bodies
+
+> You can also export your API definition as OpenAPI JSON/YAML from the UI
+
 
 ⚠️ GoSecOps is for educational and authorized testing only.
 
@@ -162,6 +208,7 @@ go run main.go
 
 # Docker development environment
 docker compose up --build
+
 
 🤝 Contributing
 
