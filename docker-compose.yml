@@ -1,29 +1,49 @@
 #version: '3.9'
 
 services:
+
   backend:
+    container_name: gosecops-backend
     build: .
     ports:
       - "8181:8181"
     environment:
       - GIN_MODE=release
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8181/swagger/index.html"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
 
   mailtest:
+    container_name: gosecops-mailtest
     image: maildev/maildev
     ports:
-      - "1080:1080"
-      - "1025:1025"
+      - "1080:1080"  # Web UI
+      - "1025:1025"  # SMTP
+    restart: unless-stopped
 
   prometheus:
+    container_name: gosecops-prometheus
     image: prom/prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/etc/prometheus
+    restart: unless-stopped
 
   grafana:
+    container_name: gosecops-grafana
     image: grafana/grafana
     ports:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  grafana-data:

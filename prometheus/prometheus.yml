@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'gosecops-backend'
+    static_configs:
+      - targets: ['backend:8181']
+        labels:
+          service: gosecops
+
+# Optional: Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

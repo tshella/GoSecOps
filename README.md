@@ -6,6 +6,24 @@
 
 ---
 
+## 📚 Table of Contents
+
+- [🚀 Features](#-features)
+- [🧱 Project Structure](#-project-structure)
+- [💻 Getting Started](#-getting-started)
+- [🔧 Build & Run](#-build--run)
+- [📬 API Endpoints](#-api-endpoints)
+- [📚 Swagger UI (Interactive API Docs)](#-swagger-ui-interactive-api-docs)
+- [📬 MailTest (MailDev) – Safe Email Testing](#-mailtest-maildev--safe-email-testing)
+- [🔐 Security & Ethics Notice](#-security--ethics-notice)
+- [🛠️ Libraries Used](#️-libraries-used)
+- [📦 Roadmap](#-roadmap)
+- [👨‍💻 Dev Commands](#-dev-commands)
+- [🤝 Contributing](#-contributing)
+- [📜 License](#-license)
+
+---
+
 ## 🚀 Features
 
 | Feature              | CLI Command             | REST API Endpoint         | Status   |
@@ -44,9 +62,10 @@ gosecops/
 ├── web/ # Optional SvelteKit frontend
 ├── Dockerfile # Multi-stage backend build
 ├── docker-compose.yml # For API + mail testing
+├── prometheus.yml # Prometheus config
 ├── main.go # Entry point
 ├── go.mod # Go module metadata
-└── README.md # Project documentation
+└── README.md # This documentation
 
 
 ---
@@ -56,8 +75,8 @@ gosecops/
 ### ✅ Prerequisites
 
 - Go 1.20+
-- Docker + Docker Compose (recommended)
-- Node.js (for optional frontend)
+- Docker + Docker Compose
+- Node.js (for optional SvelteKit frontend)
 
 ---
 
@@ -81,92 +100,77 @@ go run main.go iam check --profile default
 # S3 Bucket Audit
 go run main.go s3 audit --bucket my-bucket --profile default
 
-# DNS CNAME Misconfiguration Scan
+# DNS Misconfig Scan
 go run main.go dns cloud --domain example.com --subdomains www,api,staging
 
-🌐 API Server
+🌐 API Mode
 
-# Start API server on http://localhost:8181
 go run main.go
+
+Access:
+
+    http://localhost:8181/api
+
+    http://localhost:8181/swagger/index.html
 
 🐳 Docker Mode
 
 docker compose up --build
 
-Then access the API at:
-
-http://localhost:8181/api
-http://localhost:8181/swagger/index.html
-
-✅ Swagger UI Access (📚 API Documentation)
-
-## 📚 Swagger UI (Interactive API Docs)
+📬 API Endpoints
+Method	Endpoint	Description
+POST	/api/scan/port	Run a TCP port scan
+POST	/api/email/attack	Send a spoofed test email
+POST	/api/email/analyze	Analyze SPF/DKIM/DMARC
+POST	/api/cloud/iam	Audit AWS IAM policies
+POST	/api/cloud/s3	Detect public exposure of S3 buckets
+POST	/api/cloud/dns	Scan for DNS CNAME misconfigurations
+📚 Swagger UI (Interactive API Docs)
 
 Once the API server is running, access the Swagger UI at:
 
-➡️ [http://localhost:8181/swagger/index.html](http://localhost:8181/swagger/index.html)
+➡️ http://localhost:8181/swagger/index.html
 
 This provides:
 
-- 📖 **Full documentation** of each API route
-- 🧪 **Built-in testing interface** (send requests directly from the browser)
-- 📂 **Schema definitions** for request and response bodies
+    📖 Full documentation of each API route
 
-> You can also export your API definition as OpenAPI JSON/YAML from the UI
+    🧪 Built-in testing interface
 
-✅ Where to Insert It
+    📂 Schema definitions for request and response bodies
 
-This section should come right after 📬 API Endpoints and before 🔐 Security & Ethics Notice.
+    You can also export OpenAPI JSON/YAML from this UI.
 
-So now the sequence in your README would be:
+📬 MailTest (MailDev) – Safe Email Testing
 
-📬 API Endpoints
-📚 Swagger UI (Interactive API Docs)
-🔐 Security & Ethics Notice
-
-✅ Resulting Snippet Example
-
-## 📬 API Endpoints
-
-| Method | Endpoint             | Description                             |
-|--------|----------------------|-----------------------------------------|
-| POST   | `/api/scan/port`     | Run a TCP port scan                     |
-| POST   | `/api/email/attack`  | Send a spoofed test email               |
-| POST   | `/api/email/analyze` | Analyze SPF/DKIM/DMARC                  |
-| POST   | `/api/cloud/iam`     | Audit AWS IAM policies                  |
-| POST   | `/api/cloud/s3`      | Detect public exposure of S3 buckets    |
-| POST   | `/api/cloud/dns`     | Scan for DNS CNAME misconfigurations    |
-
----
-
-This provides:
-
-- 📖 **Full documentation** of each API route
-- 🧪 **Built-in testing interface** (send requests directly from the browser)
-- 📂 **Schema definitions** for request and response bodies
-
-> You can also export your API definition as OpenAPI JSON/YAML from the UI
-
-
-⚠️ GoSecOps is for educational and authorized testing only.
-
-    Never scan or spoof any system or domain you do not own or have explicit permission to test.
-
-    Spoofed emails are routed to Mailhog/Maildev in isolated testing environments.
-
-    Logs and audit trails are in planning to ensure safe usage and traceability.
-
-🧪 Testing Environment (Email Spoofing)
-
-Include this in your docker-compose.yml:
+MailTest uses MailDev, a fake SMTP server with a web inbox. It captures spoofed emails locally, ensuring safe red-team simulations.
+🔧 Docker Integration
 
 mailtest:
   image: maildev/maildev
   ports:
-    - "1080:1080"  # Mail Web UI
+    - "1080:1080"  # Web UI
     - "1025:1025"  # SMTP test port
 
-📬 Access captured emails at: http://localhost:1080
+✉️ Example Usage
+
+go run main.go email attack --from admin@paypal.com --to victim@example.com
+
+Then open http://localhost:1080 to view the email.
+Feature	Benefit
+SMTP inbox	No email is actually delivered
+Web UI	Real-time message viewing
+Safe sandbox	Great for testing phishing flows
+🔐 Security & Ethics Notice
+
+⚠️ GoSecOps is intended for educational or authorized security testing only.
+
+    Never test domains or IPs you do not own or have written permission for.
+
+    Spoofed emails are routed to sandboxed environments (MailDev).
+
+    Future versions will log audit trails and offer RBAC.
+
 🛠️ Libraries Used
 Purpose	Library
 CLI Framework	github.com/spf13/cobra
@@ -180,9 +184,9 @@ Port Scanning	net.DialTimeout
 
     ✅ Cloud IAM, S3, DNS misconfig modules
 
-    ✅ Swagger API documentation
+    ✅ Swagger/OpenAPI docs
 
-    ✅ SvelteKit frontend (in progress)
+    ✅ SvelteKit frontend
 
     ⏳ Security header analyzer
 
@@ -190,25 +194,23 @@ Port Scanning	net.DialTimeout
 
     ⏳ WebSocket log streams
 
-    ⏳ Role-based API auth (JWT/OAuth)
+    ⏳ JWT/OAuth-based API authentication
 
 👨‍💻 Dev Commands
 
-# Run a scan
+# Run CLI audit
 go run main.go s3 audit --bucket my-bucket --profile default
 
-# Start the API server
+# Start API server
 go run main.go
 
-# Docker development environment
+# Docker dev environment
 docker compose up --build
-
 
 🤝 Contributing
 
-Contributions are welcome!
-Please include unit tests for any new modules or features.
-We appreciate pull requests, feedback, and security reviews.
+We welcome pull requests, issue reports, and security reviews.
+Please include unit tests for new features or modules.
 📜 License
 
 MIT License – see LICENSE
